@@ -50,4 +50,11 @@ public class CommentService {
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
     }
+
+    public void editComment(Long postId, Long commentId, String text)
+    {
+        Comment comment = commentRepository.findById(commentId).get();
+        comment.setText(text);
+        commentRepository.save(comment);
+    }
 }

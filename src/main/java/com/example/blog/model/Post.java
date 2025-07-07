@@ -64,8 +64,6 @@ public class Post {
                 ", image=" + Arrays.toString(image) +
                 ", text='" + text + '\'' +
                 ", likes=" + likes +
-                ", comments=" + comments +
-                ", tags=" + tags +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

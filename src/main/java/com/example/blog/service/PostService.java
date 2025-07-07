@@ -3,6 +3,7 @@ package com.example.blog.service;
 import com.example.blog.model.Post;
 import com.example.blog.model.Tag;
 import com.example.blog.repository.PostRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,13 @@ public class PostService {
     public List<Post> findAll() {
         return postRepository.findAll();
     }
-
-    public Optional<Post> findById(Long id) {
-        return postRepository.findById(id);
+    @Transactional
+    public Page<Post> findAll(Pageable page) {
+        return postRepository.findAll(page);
+    }
+    @Transactional
+    public Post findById(Long id) {
+        return postRepository.findById(id).get();
     }
 
     public Post createPost(String title, byte[] image, String tagsText, String text) {
@@ -64,5 +69,18 @@ public class PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+    @Transactional
+    public Post findByIdWithCommentsAndTags(Long id)
+    {
+        return postRepository.findByIdWithCommentsAndTags(id).get();
+    }
 
+    public void likePost(Long id, boolean like) {
+        Post post = findById(id);
+        if (like)
+            post.setLikes(post.getLikes() + 1);
+        else
+            post.setLikes(post.getLikes() - 1);
+        postRepository.save(post);
+    }
 }

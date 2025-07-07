@@ -21,17 +21,17 @@
                     <p>
                         <label for="pageSize">Число постов: </label>
                         <select id="pageSize" name="pageSize" onchange="this.form.submit()">
-                            <option value="5" th:selected="${paging.pageSize()==5}">5</option>
-                            <option value="10" th:selected="${paging.pageSize()==10}">10</option>
-                            <option value="20" th:selected="${paging.pageSize()==20}">20</option>
-                            <option value="50" th:selected="${paging.pageSize()==50}">50</option>
-                            <option value="100" th:selected="${paging.pageSize()==100}">100</option>
+                            <option value="5" th:selected="${paging.getSize()==5}">5</option>
+                            <option value="10" th:selected="${paging.getSize()==10}">10</option>
+                            <option value="20" th:selected="${paging.getSize()==20}">20</option>
+                            <option value="50" th:selected="${paging.getSize()==50}">50</option>
+                            <option value="100" th:selected="${paging.getSize()==100}">100</option>
                         </select>
                     </p>
                     <p>
-                        <button th:if="${paging.hasPrevious()}" name="pageNumber" th:value="${paging.pageNumber()-1}">&lt;</button>
-                        <span th:text="${'Страница: '+paging.pageNumber()}"></span>
-                        <button th:if="${paging.hasNext()}" name="pageNumber" th:value="${paging.pageNumber()+1}">&gt;</button>
+                        <button th:if="${paging.hasPrevious()}" name="pageNumber" th:value="${paging.getNumber()-1}">&lt;</button>
+                        <span th:text="${'Страница: '+paging.getNumber()}"></span>
+                        <button th:if="${paging.hasNext()}" name="pageNumber" th:value="${paging.getNumber()+1}">&gt;</button>
                     </p>
                 </form>
             </td>
@@ -44,9 +44,9 @@
                         <img height="300" th:src="${'http://localhost:8080/images/'+post.getId()}">
                     </a>
                 </p>
-                <p th:text="${post.getTextPreview()}"></p>
+<!--                <p th:text="${post.getTextPreview()}"></p>-->
                 <p>
-                    <span th:text="${'&#x1F44D; '+post.getLikes()()}"></span>
+                    <span th:text="${'&#x1F44D; '+post.getLikes()}"></span>
                     <span th:text="${'&#x2709; '+post.getComments().size()}"></span>
                 </p>
                 <p>

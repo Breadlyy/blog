@@ -68,7 +68,7 @@
                 <p>
                     <form th:action="${'/posts/'+post.getId()+'/like'}" method="post">
                         <button name="like" value="true">&#x1F44D;</button>
-                        <span th:text="${post.getLikesCount()}"></span>
+                        <span th:text="${post.getLikes()}"></span>
                         <button name="like" value="false">&#128078;</button>
                         <span th:text="${'комментарии '+post.getComments().size()}" style="float:right;"></span>
                     </form>
@@ -78,9 +78,9 @@
                 </p>
             </td>
         </tr>
-        <tr th:each="textPart : ${post.getTextParts()}">
-            <td th:text="${textPart}"></td>
-        </tr>
+<!--        <tr th:each="textPart : ${post.getTextParts()}">-->
+<!--            <td th:text="${textPart}"></td>-->
+<!--        </tr>-->
         <tr>
             <td>
                 <hr>
