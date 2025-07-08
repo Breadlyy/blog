@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "posts")
@@ -52,10 +53,16 @@ public class Post {
     public void setUpdatedAt() {
         this.updatedAt = LocalDateTime.now();
     }
-    public String getTagsAsText()
-    {
-        return tags.toString();
+    public String getTagsAsText() {
+        if (tags == null || tags.isEmpty()) {
+            return "";
+        }
+        return tags.stream()
+                .map(Tag::getName)
+                .sorted()
+                .collect(Collectors.joining(", "));
     }
+
     @Override
     public String toString() {
         return "Post{" +

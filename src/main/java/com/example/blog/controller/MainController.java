@@ -44,10 +44,12 @@ public class MainController {
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> page;
-
+        if (search != null && !search.isEmpty()) {
+            page = postService.findByTag(search, pageable);
+        }
+        else {
             page = postService.findAll(pageable);
-
-
+        }
         System.out.println(page.toString());
         model.addAttribute("posts", page.getContent());
         model.addAttribute("paging", page);
@@ -173,11 +175,5 @@ public class MainController {
     {
         commentService.deleteComment(commentId);
         return "redirect:/posts/" + postId;
-    }
-    @PostMapping("/posts/{id}/delete")
-    public String deletePostById(@PathVariable Long id)
-    {
-        postService.deletePost(id);
-        return "redirect:/posts";
     }
 }

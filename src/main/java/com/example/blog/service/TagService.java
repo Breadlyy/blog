@@ -28,9 +28,16 @@ public class TagService {
         Set<Tag> tags = new HashSet<>();
         for (String name : parts) {
             if (name.isBlank()) continue;
-            Tag tag = tagRepository.findByName(name)
-                    .orElseGet(() -> tagRepository.save(new Tag(null, name, new HashSet<>())));
-            tags.add(tag);
+            Optional<Tag> tag = tagRepository.findByName(name);
+            if(tag.isEmpty())
+            {
+                Tag newTag = new Tag(null, name, new HashSet<>());
+                tagRepository.save(newTag);
+                tags.add(newTag);
+            }
+            else {
+                tags.add(tag.get());
+            }
         }
         return tags;
     }

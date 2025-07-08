@@ -49,9 +49,8 @@
                     <span th:text="${'&#x1F44D; '+post.getLikes()}"></span>
                     <span th:text="${'&#x2709; '+post.getComments().size()}"></span>
                 </p>
-                <p>
-                    <span th:each="tag : ${post.getTags()}" th:text="${'#'+tag+' '}"></span>
-                </p>
+                <p th:text="${post.tagsAsText}"></p>
+
             </td>
         </tr>
     </table>

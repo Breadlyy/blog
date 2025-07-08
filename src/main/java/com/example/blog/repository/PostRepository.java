@@ -22,12 +22,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     """)
     Optional<Post> findById(Long id);
     List<Post> findAll();
-    @Query("""
-    SELECT DISTINCT p FROM Post p
-    LEFT JOIN FETCH p.tags
-    LEFT JOIN FETCH p.comments
-""")
-    Page<Post> findAll(Pageable page);
+    @Override
+    @EntityGraph(attributePaths = {"tags", "comments"})
+    Page<Post> findAll(Pageable pageable);
+
+
     @Query("""
     SELECT DISTINCT p FROM Post p
     LEFT JOIN FETCH p.comments
@@ -35,4 +34,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     WHERE p.id = :id
     """)
     Optional<Post> findByIdWithCommentsAndTags(@Param("id") Long id);
+    @EntityGraph(attributePaths = {"tags"})
+    @Query("""
+    SELECT DISTINCT p FROM Post p
+    JOIN p.tags t
+    WHERE LOWER(t.name) LIKE LOWER(CONCAT(:prefix, '%'))
+""")
+    Page<Post> findByTagStartingWith(@Param("prefix") String prefix, Pageable pageable);
+
 }

@@ -1,22 +1,14 @@
 package com.example.blog.service;
 
 import com.example.blog.model.Post;
-import com.example.blog.model.Tag;
 import com.example.blog.repository.PostRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class PostService {
@@ -29,13 +21,11 @@ public class PostService {
         this.tagService = tagService;
     }
 
-    public List<Post> findAll() {
-        return postRepository.findAll();
-    }
     @Transactional
     public Page<Post> findAll(Pageable page) {
         return postRepository.findAll(page);
     }
+
     @Transactional
     public Post findById(Long id) {
         return postRepository.findById(id).get();
@@ -82,5 +72,11 @@ public class PostService {
         else
             post.setLikes(post.getLikes() - 1);
         postRepository.save(post);
+    }
+
+    @Transactional
+    public Page<Post> findByTag(String search, Pageable pageable) {
+        Page<Post> page = postRepository.findByTagStartingWith(search, pageable);
+        return page;
     }
 }
