@@ -7,11 +7,10 @@ import com.example.blog.model.Post;
 import com.example.blog.repository.CommentRepository;
 import com.example.blog.repository.PostRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -22,14 +21,6 @@ public class CommentService {
         this.postRepository = postRepository;
     }
 
-    public List<Comment> findCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
-    }
-
-    public Optional<Comment> findById(Long id) {
-        return commentRepository.findById(id);
-    }
-
     public Comment addComment(Long postId, String text) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post with id " + postId + " not found"));
@@ -38,7 +29,6 @@ public class CommentService {
         comment.setText(text);
         return commentRepository.save(comment);
     }
-
     public Comment updateComment(Long commentId, String newText) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found: " + commentId));
@@ -49,7 +39,6 @@ public class CommentService {
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
     }
-
     public void editComment(Long commentId, String text)
     {
         Comment comment = commentRepository.findById(commentId)

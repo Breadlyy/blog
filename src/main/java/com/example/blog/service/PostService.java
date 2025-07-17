@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -23,12 +24,10 @@ public class PostService {
         this.tagService = tagService;
     }
 
-    @Transactional
     public Page<Post> findAll(Pageable page) {
         return postRepository.findAll(page);
     }
 
-    @Transactional
     public Post findById(Long id) {
         return postRepository.findById(id).get();
     }
@@ -62,7 +61,6 @@ public class PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
-    @Transactional
     public Post findPostByIdWithCommentsAndTags(Long id)
     {
         return postRepository.findByIdWithCommentsAndTags(id)
@@ -78,7 +76,6 @@ public class PostService {
         postRepository.save(post);
     }
 
-    @Transactional
     @Cacheable(value = "postsByTag", key = "#search + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<Post> findByTag(String search, Pageable pageable) {
         return postRepository.findByTagStartingWith(search, pageable);
