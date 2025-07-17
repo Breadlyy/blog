@@ -41,7 +41,6 @@ public class MainController {
         else {
             page = postService.findAll(pageable);
         }
-        System.out.println(page.toString());
         model.addAttribute("posts", page.getContent());
         model.addAttribute("paging", page);
         model.addAttribute("search", search);
