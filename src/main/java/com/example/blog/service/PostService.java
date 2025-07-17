@@ -1,14 +1,16 @@
 package com.example.blog.service;
 
+import com.example.blog.exception.PostNotFoundException;
 import com.example.blog.model.Post;
 import com.example.blog.repository.PostRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
 @Service
 public class PostService {
@@ -31,6 +33,7 @@ public class PostService {
         return postRepository.findById(id).get();
     }
 
+    @CacheEvict(value = "postsByTag", allEntries = true)
     public Post createPost(String title, byte[] image, String tagsText, String text) {
         Post post = new Post();
         post.setTitle(title);
@@ -42,10 +45,10 @@ public class PostService {
         post.setTags(tagService.parseTags(tagsText));
         return postRepository.save(post);
     }
-
+    @CacheEvict(value = "postsByTag", allEntries = true)
     public Post updatePost(Long id, String title, byte[] image, String tagsText, String text) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Post not found with id " + id));
+                .orElseThrow(() -> new PostNotFoundException("Post not found with id " + id));
         post.setTitle(title);
         post.setText(text);
         if (image != null && image.length > 0) {
@@ -55,14 +58,15 @@ public class PostService {
         post.setUpdatedAt(LocalDateTime.now());
         return postRepository.save(post);
     }
-
+    @CacheEvict(value = "postsByTag", allEntries = true)
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
     @Transactional
-    public Post findByIdWithCommentsAndTags(Long id)
+    public Post findPostByIdWithCommentsAndTags(Long id)
     {
-        return postRepository.findByIdWithCommentsAndTags(id).get();
+        return postRepository.findByIdWithCommentsAndTags(id)
+                .orElseThrow(() ->  new PostNotFoundException("Post not found with id " + id));
     }
 
     public void likePost(Long id, boolean like) {
@@ -75,8 +79,12 @@ public class PostService {
     }
 
     @Transactional
+    @Cacheable(value = "postsByTag", key = "#search + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<Post> findByTag(String search, Pageable pageable) {
-        Page<Post> page = postRepository.findByTagStartingWith(search, pageable);
-        return page;
+        return postRepository.findByTagStartingWith(search, pageable);
+    }
+    public Post save(Post post)
+    {
+        return postRepository.save(post);
     }
 }

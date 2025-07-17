@@ -1,14 +1,13 @@
 package com.example.blog.service;
 
-import com.example.blog.model.Comment;
 import com.example.blog.model.Tag;
 import com.example.blog.repository.TagRepository;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TagService {

@@ -1,15 +1,14 @@
 package com.example.blog.service;
 
+import com.example.blog.exception.CommentNotFoundException;
+import com.example.blog.exception.PostNotFoundException;
 import com.example.blog.model.Comment;
 import com.example.blog.model.Post;
 import com.example.blog.repository.CommentRepository;
 import com.example.blog.repository.PostRepository;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -33,7 +32,7 @@ public class CommentService {
 
     public Comment addComment(Long postId, String text) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("Post not found: " + postId));
+                .orElseThrow(() -> new PostNotFoundException("Post with id " + postId + " not found"));
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setText(text);
@@ -42,7 +41,7 @@ public class CommentService {
 
     public Comment updateComment(Long commentId, String newText) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("Comment not found: " + commentId));
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found: " + commentId));
         comment.setText(newText);
         return commentRepository.save(comment);
     }
@@ -51,9 +50,10 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    public void editComment(Long postId, Long commentId, String text)
+    public void editComment(Long commentId, String text)
     {
-        Comment comment = commentRepository.findById(commentId).get();
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment with id " + commentId + " not found"));
         comment.setText(text);
         commentRepository.save(comment);
     }
