@@ -74,7 +74,7 @@
                     </form>
                 </p>
                 <p>
-                    <span th:each="tag : ${post.getTags()}" th:text="${'#'+tag+' '}"></span>
+                    <span th:each="tag : ${post.getTagsAsText()}" th:text="${'#'+tag+' '}"></span>
                 </p>
             </td>
         </tr>

@@ -67,6 +67,20 @@ public class MainController {
         postService.updatePost(id, title, imageBytes, tags, text);
         return "redirect:/posts/" + id;
     }
+    @PostMapping("/posts")
+    public String addPost(
+            @RequestParam("title") String title,
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam("tags") String tags,
+            @RequestParam("text") String text,
+            Model model) throws IOException {
+        System.out.println("Title: " + title);
+        System.out.println("Tags: " + tags);
+        System.out.println("Text: " + text);
+        byte[] imageBytes = (image != null) ? image.getBytes() : null;
+        Post post = postService.createPost(title, imageBytes, tags, text);
+        return "redirect:/posts/" + post.getId();
+    }
     @GetMapping("/posts/add")
     public String showCreatePostForm() {
         return "add-post";

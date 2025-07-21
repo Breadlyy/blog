@@ -55,7 +55,7 @@ public class PostService {
         }
         post.setTags(tagService.parseTags(tagsText));
         post.setUpdatedAt(LocalDateTime.now());
-        return postRepository.save(post);
+        return postRepository.update(post);
     }
     @CacheEvict(value = "postsByTag", allEntries = true)
     public void deletePost(Long id) {

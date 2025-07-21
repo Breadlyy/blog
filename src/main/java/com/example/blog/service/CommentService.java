@@ -9,6 +9,8 @@ import com.example.blog.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 public class CommentService {
@@ -27,6 +29,8 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setText(text);
+        comment.setCreatedAt(LocalDateTime.now());
+        comment.setUpdatedAt(LocalDateTime.now());
         return commentRepository.save(comment);
     }
     public Comment updateComment(Long commentId, String newText) {
@@ -44,6 +48,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment with id " + commentId + " not found"));
         comment.setText(text);
-        commentRepository.save(comment);
+        comment.setUpdatedAt(LocalDateTime.now());
+        commentRepository.update(comment);
     }
 }
