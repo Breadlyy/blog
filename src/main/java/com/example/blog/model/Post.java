@@ -22,12 +22,10 @@ public class Post {
     @Column(nullable = false)
     private String title;
 
-    @Lob
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition = "BYTEA")
     private byte[] image;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(name = "text", columnDefinition = "TEXT", nullable = false)
     private String text;
 
     private int likes = 0;
