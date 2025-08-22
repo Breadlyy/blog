@@ -33,3 +33,7 @@ dependencies {
 bootJar {
     exclude 'org/projectlombok/**'
 }
+
+test {
+    useJUnitPlatform()
+}
