@@ -1,25 +1,31 @@
 package com.example.blog.controller;
 
 import com.example.blog.model.Post;
+import com.example.blog.model.dto.PostRequest;
 import com.example.blog.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @Controller
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
+
     private final PostService postService;
-    @GetMapping("/")
+
+    @GetMapping
     public String getAllPosts(
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -27,74 +33,72 @@ public class PostController {
             Model model
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> page;
-        if (search != null && !search.isEmpty()) {
-            page = postService.findByTag(search, pageable);
-        }
-        else {
-            page = postService.findAll(pageable);
-        }
+        Page<Post> page = (search != null && !search.isEmpty())
+                ? postService.findByTag(search, pageable)
+                : postService.findAll(pageable);
+
         model.addAttribute("posts", page.getContent());
         model.addAttribute("paging", page);
         model.addAttribute("search", search);
-
         return "posts";
     }
+
     @GetMapping("/{id}")
     public String getPostById(@PathVariable Long id, Model model) {
         Post post = postService.findPostByIdWithCommentsAndTags(id);
         model.addAttribute("post", post);
         return "post";
     }
-    @PostMapping("/")
-    public String addPost(
-            @RequestParam("title") String title,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam("tags") String tags,
-            @RequestParam("text") String text,
-            Model model) throws IOException {
-        System.out.println("Title: " + title);
-        System.out.println("Tags: " + tags);
-        System.out.println("Text: " + text);
-        byte[] imageBytes = (image != null) ? image.getBytes() : null;
-        Post post = postService.createPost(title, imageBytes, tags, text);
-        return "redirect:/posts/" + post.getId();
-    }
-    @PostMapping("/{id}")
-    public String editPost(
-            @PathVariable Long id,
-            @RequestParam String title,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam String tags,
-            @RequestParam String text,
-            Model model) throws IOException {
 
-        byte[] imageBytes = (image != null) ? image.getBytes() : null;
-        postService.updatePost(id, title, imageBytes, tags, text);
-        return "redirect:/posts/" + id;
-    }
     @GetMapping("/add")
-    public String showCreatePostForm() {
+    public String showCreatePostForm(Model model) {
+        model.addAttribute("postRequest", new PostRequest());
         return "add-post";
+    }
+
+    @PostMapping
+    public String addPost(@Valid @ModelAttribute("postRequest") PostRequest postRequest,
+                          BindingResult bindingResult,
+                          Model model) throws IOException {
+        if (bindingResult.hasErrors()) {
+            return "add-post";
+        }
+
+        byte[] imageBytes = (postRequest.getImage() != null) ? postRequest.getImage().getBytes() : null;
+        Post post = postService.createPost(
+                postRequest.getTitle(),
+                imageBytes,
+                postRequest.getTags(),
+                postRequest.getText()
+        );
+
+        return "redirect:/posts/" + post.getId();
     }
 
     @GetMapping("/{id}/edit")
     public String showEditPostForm(@PathVariable Long id, Model model) {
-        model.addAttribute("post", postService.findById(id));
+        Post post = postService.findById(id);
+        model.addAttribute("post", post);
         return "add-post";
     }
 
-    @PostMapping("/posts/{id}/edit")
-    public String updatePost(
-            @PathVariable Long id,
-            @RequestParam String title,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam String tags,
-            @RequestParam String text,
-            Model model) throws IOException {
+    @PostMapping("/{id}")
+    public String editPost(@PathVariable Long id,
+                           @Valid @ModelAttribute("postRequest") PostRequest postRequest,
+                           BindingResult bindingResult,
+                           Model model) throws IOException {
+        if (bindingResult.hasErrors()) {
+            return "add-post";
+        }
 
-        byte[] imageBytes = (image != null) ? image.getBytes() : null;
-        postService.updatePost(id, title, imageBytes, tags, text);
+        byte[] imageBytes = (postRequest.getImage() != null) ? postRequest.getImage().getBytes() : null;
+        postService.updatePost(id,
+                postRequest.getTitle(),
+                imageBytes,
+                postRequest.getTags(),
+                postRequest.getText()
+        );
+
         return "redirect:/posts/" + id;
     }
 
@@ -104,11 +108,8 @@ public class PostController {
         return "redirect:/posts";
     }
 
-
     @PostMapping("/{id}/like")
-    public String likePost(@PathVariable Long id,
-                           @RequestParam boolean like)
-    {
+    public String likePost(@PathVariable Long id, @RequestParam boolean like) {
         postService.likePost(id, like);
         return "redirect:/posts/" + id;
     }

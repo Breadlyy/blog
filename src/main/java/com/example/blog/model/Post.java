@@ -2,16 +2,20 @@ package com.example.blog.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "posts")
-@Data
+@Data @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post {
@@ -66,7 +70,6 @@ public class Post {
         return "Post{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", image=" + Arrays.toString(image) +
                 ", text='" + text + '\'' +
                 ", likes=" + likes +
                 ", createdAt=" + createdAt +

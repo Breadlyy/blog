@@ -29,19 +29,20 @@ public class PostService {
     }
 
     public Post findById(Long id) {
-        return postRepository.findById(id).get();
+        return postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post with id " + id + " not found."));
     }
 
     @CacheEvict(value = "postsByTag", allEntries = true)
     public Post createPost(String title, byte[] image, String tagsText, String text) {
-        Post post = new Post();
-        post.setTitle(title);
-        post.setText(text);
-        post.setImage(image);
-        post.setLikes(0);
-        post.setCreatedAt(LocalDateTime.now());
-        post.setUpdatedAt(LocalDateTime.now());
-        post.setTags(tagService.parseTags(tagsText));
+        Post post = Post.builder()
+                .title(title)
+                .text(text)
+                .image(image)
+                .likes(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .tags(tagService.parseTags(tagsText))
+                .build();
         return postRepository.save(post);
     }
     @CacheEvict(value = "postsByTag", allEntries = true)
